@@ -13,6 +13,8 @@ You are tasked with setting up and deploying a system that meets the following c
 3. **Global Admin Panel:** Secure admin endpoints using Firebase Auth Custom Claims (`admin: true`) to manage PINs, brand configurations, and custom subdomains.
 4. **Editable Dashboard Template:** Support a JSON-driven or Markdown-driven template structure that allows administrators to easily update dashboard content for each brand.
 
+# BIG THING: GOBAL ADMIN PANEL TO CREATE BRANDS, RESET PINS, CREATE PINS, MANGE INVITES AND MORE
+
 ---
 
 ## 🏗 System Architecture

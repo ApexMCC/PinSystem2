@@ -1,45 +1,44 @@
 # PIN System
 
-A simple PHP PIN-gated page. Enter the PIN, get in. No database needed.
+A simple PHP page that's locked behind a PIN. Enter the PIN, get in. No database needed.
 
-- **PIN: `1200`** (change it from the Admin page)
+- Default PIN: `1200` — change it from the admin page.
 
-## Files
+## Pages
 
-```
-index.php      Login — enter the PIN
-dashboard.php  Protected page (only with a valid session)
-admin.php      Change the PIN (needs the current PIN)
-logout.php     Sign out
-config.php     Settings + default PIN hash
-functions.php  Helpers
-style.css      Styling
-```
+| File           | What it does                                        |
+| -------------- | --------------------------------------------------- |
+| `index.php`    | Login page — enter the PIN                          |
+| `dashboard.php`| Protected page, only reachable after a valid login  |
+| `admin.php`    | Change the PIN (requires the current PIN)           |
+| `logout.php`   | Logs you out and sends you back to the login page   |
+| `config.php`   | Settings (session options + default PIN hash)       |
+| `style.css`    | Styling                                             |
 
 ## How it works
 
-- The PIN is stored as a **bcrypt hash** (never plaintext) in `pin.hash` (created the first time you change it). If that file is missing, the default PIN `1200` applies.
-- Login creates a session cookie; `dashboard.php` requires it and otherwise redirects to the login.
-- Change the PIN at `admin.php` — you must enter the current PIN first. The new PIN is hashed and saved to `pin.hash`.
+- The PIN is never stored in plain text. It's saved as a **bcrypt hash**.
+- The current hash lives in `pin.hash`. On first run that file doesn't exist yet, so the default PIN from `config.php` (`1200`) is used.
+- Logging in creates a session cookie. `dashboard.php` checks that cookie and redirects to the login page if it's missing or expired.
+- Use `admin.php` to set a new PIN — you have to enter the current PIN first. The new PIN is hashed and written to `pin.hash`.
 
-## Deploy (Hostinger)
+## Deploying on Hostinger
 
-1. Upload the whole folder to `public_html` (or a subfolder) via FTP or hPanel File Manager.
-2. Open `https://yourdomain.com/` — you'll see the PIN page.
-3. Visit `admin.php` and change the PIN from the default `1200`.
-4. Make sure PHP can write to the folder so it can create/update `pin.hash` (set folder permissions to `755` or `775`; if using hPanel, the files already run as the account user).
+1. Upload the folder to `public_html` (or a subfolder) with FTP or the hPanel file manager.
+2. Open your domain — you'll see the PIN page.
+3. Go to `admin.php` and change the PIN from the default `1200`.
+4. PHP needs permission to write `pin.hash` in this folder. In hPanel the files already run as your account user, so it usually just works. If changing the PIN fails with a permissions error, set the folder permissions to `755` (or `775`).
 
-## Changing the PIN manually
+## Changing the PIN manually (if you can't reach admin)
 
-If you can't reach the admin page, generate a hash and save it to `pin.hash`:
+Generate a hash and save it to `pin.hash`:
 
 ```bash
-php -r "echo password_hash('yourpin', PASSWORD_BCRYPT), PHP_EOL;"
-# paste the output into a file named pin.hash (no extra spaces/newlines)
+php -r "echo password_hash('yournewpin', PASSWORD_BCRYPT), PHP_EOL;"
 ```
 
-Or use an online bcrypt generator and save its output to `pin.hash`.
+Copy the output into a file named `pin.hash` (no extra spaces or blank lines).
 
 ## Security note
 
-The PIN is verified server-side, so it can't be read from the page source — but for anything truly sensitive, use a real account system instead of a shared PIN.
+The PIN is checked on the server, so it can't be read from the page source. That's fine for gating access to a simple page, but if you're protecting something sensitive, use real per-user accounts instead of a shared PIN.

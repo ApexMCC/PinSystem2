@@ -1,35 +1,45 @@
-# Developer Implementation Guide: Dynamic PIN Authentication & Branding System
+# PIN System
 
-This repository contains the architecture and specifications for building a multi-tenant, PIN-authenticated web application with dynamic rebranding and subdomain routing capabilities.
+A simple PHP PIN-gated page. Enter the PIN, get in. No database needed.
 
----
+- **PIN: `1200`** (change it from the Admin page)
 
-## 🎯 Developer Objectives
+## Files
 
-You are tasked with setting up and deploying a system that meets the following core requirements:
+```
+index.php      Login — enter the PIN
+dashboard.php  Protected page (only with a valid session)
+admin.php      Change the PIN (needs the current PIN)
+logout.php     Sign out
+config.php     Settings + default PIN hash
+functions.php  Helpers
+style.css      Styling
+```
 
-1. **Secure PIN Auth:** Validate user-entered PINs (maximum 4 digits) against salted `bcrypt` hashes. Plaintext PINs must never be stored in the database.
-2. **Dynamic Rebranding & Routing:** Upon entering a valid PIN, the system must either fetch and render brand-specific themes (logo, primary color, layout configuration) or **redirect the user to a dedicated subdomain** configured for that specific brand.
-3. **Global Admin Panel:** Secure admin endpoints using Firebase Auth Custom Claims (`admin: true`) to manage PINs, brand configurations, and custom subdomains.
-4. **Editable Dashboard Template:** Support a JSON-driven or Markdown-driven template structure that allows administrators to easily update dashboard content for each brand.
-5. **Redesign Pin Login Page** Redo the pin login page so it seems more modern
+## How it works
 
-# BIG THING: GOBAL ADMIN PANEL TO CREATE BRANDS, RESET PINS, CREATE PINS, MANGE INVITES AND MORE
+- The PIN is stored as a **bcrypt hash** (never plaintext) in `pin.hash` (created the first time you change it). If that file is missing, the default PIN `1200` applies.
+- Login creates a session cookie; `dashboard.php` requires it and otherwise redirects to the login.
+- Change the PIN at `admin.php` — you must enter the current PIN first. The new PIN is hashed and saved to `pin.hash`.
 
----
+## Deploy (Hostinger)
 
-## 🏗 System Architecture
+1. Upload the whole folder to `public_html` (or a subfolder) via FTP or hPanel File Manager.
+2. Open `https://yourdomain.com/` — you'll see the PIN page.
+3. Visit `admin.php` and change the PIN from the default `1200`.
+4. Make sure PHP can write to the folder so it can create/update `pin.hash` (set folder permissions to `755` or `775`; if using hPanel, the files already run as the account user).
 
-```text
-  [ Client Input (PIN) ]
-           │
-           ▼
-  [ Express API Server ] ──(Verify PIN Hash)──► [ Firestore: /pins ]
-           │                                          │
-   (Fetch Brand Metadata)                             │
-           │                                          ▼
-           ├───────────────────────────────► [ Firestore: /brands ]
-           │
-           ├─── (If Subdomain Configured) ──► Redirect to [ https://{brand}.yourdomain.com ]
-           │
-           └─── (If In-App Configured) ────► Render Dynamic Dynamic Dashboard Layout
+## Changing the PIN manually
+
+If you can't reach the admin page, generate a hash and save it to `pin.hash`:
+
+```bash
+php -r "echo password_hash('yourpin', PASSWORD_BCRYPT), PHP_EOL;"
+# paste the output into a file named pin.hash (no extra spaces/newlines)
+```
+
+Or use an online bcrypt generator and save its output to `pin.hash`.
+
+## Security note
+
+The PIN is verified server-side, so it can't be read from the page source — but for anything truly sensitive, use a real account system instead of a shared PIN.

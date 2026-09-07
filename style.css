@@ -948,3 +948,240 @@ table .empty { color: var(--muted); text-align: center; padding: 22px; }
     width: 100vw;
   }
 }
+/* ============================================================
+   Ops Wall Dashboard (five-box layout)
+   ============================================================ */
+
+body.wall-page {
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.dash-wall {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background:
+    radial-gradient(1200px 800px at 85% -10%, rgba(59, 201, 78, 0.05), transparent 60%),
+    #0a0e13;
+}
+
+.wall-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.wall-col--left  { flex: 3 1 0; }
+.wall-col--right { flex: 2 1 0; }
+
+.wall-box {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid #2a3441;
+  border-radius: 16px;
+  background-color: #0d131a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.wall-name,
+.wall-meta {
+  position: absolute;
+  z-index: 2;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+  user-select: none;
+}
+
+.wall-name {
+  top: 14px;
+  left: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #e6edf3;
+  background: rgba(6, 10, 14, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  backdrop-filter: blur(4px);
+}
+
+.wall-name::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
+  flex: none;
+}
+
+.wall-meta {
+  top: 14px;
+  right: 14px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #5d6d7e;
+}
+
+/* Box 1 - Floor plan (left 60% x top 85%) */
+
+.wall-box--map {
+  flex: 85 1 0;
+  background-color: #121820;
+  background-image:
+    linear-gradient(rgba(96, 150, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 150, 255, 0.07) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.wall-box--map::before,
+.wall-box--map::after {
+  content: '';
+  position: absolute;
+  background: rgba(96, 150, 255, 0.10);
+}
+
+.wall-box--map::before {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+}
+
+.wall-box--map::after {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+}
+
+.wall-box--map .wall-name { color: #9cc9ff; }
+
+/* Box 2 - Data table (right 40% x top 33%) */
+
+.wall-box--table {
+  background-color: #1a222c;
+}
+
+.wall-box--table .wall-name { color: #dce4ee; }
+
+/* Boxes 3 & 4 - Camera feeds (right 40% column) */
+
+.wall-box--cam {
+  background-color: #0b0f14;
+}
+
+.wall-box--cam::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 70px rgba(0, 0, 0, 0.4);
+}
+
+.wall-box--cam .wall-name {
+  color: #ffffff;
+}
+
+.wall-box--cam .wall-name::before {
+  border-radius: 50%;
+  background: #ff5d5d;
+  box-shadow: 0 0 8px rgba(255, 93, 93, 0.9);
+}
+
+/* Box 5 - Sector status (left 60% x bottom 15%) */
+
+.wall-box--status {
+  flex: 15 1 0;
+  padding: 12px;
+  background-color: #0d1217;
+}
+
+.wall-status-row {
+  display: flex;
+  gap: 8px;
+  height: 100%;
+}
+
+.stat-col {
+  flex: 1;
+  min-width: 0;
+  border-radius: 10px;
+}
+
+.stat-col--green  { background: linear-gradient(180deg, #43c96e, #2a9e50); }
+.stat-col--orange { background: linear-gradient(180deg, #f2a44c, #cf7d2e); }
+.stat-col--red    { background: linear-gradient(180deg, #f2635c, #d13a34); }
+
+.wall-logout {
+  position: fixed;
+  right: 18px;
+  bottom: 14px;
+  z-index: 5;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(160, 180, 200, 0.45);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.wall-logout:hover {
+  color: #e6edf3;
+}
+
+/* Ops wall responsive fallback */
+
+@media (max-width: 860px) {
+  body.wall-page {
+    height: auto;
+    overflow: auto;
+  }
+
+  .dash-wall {
+    position: static;
+    flex-direction: column;
+    height: auto;
+  }
+
+  .wall-col--left,
+  .wall-col--right {
+    flex: none;
+  }
+
+  .wall-box--map,
+  .wall-box--table,
+  .wall-box--cam {
+    flex: none;
+    height: 200px;
+  }
+
+  .wall-box--status {
+    flex: none;
+    height: 120px;
+  }
+
+  .wall-logout {
+    position: static;
+    display: block;
+    width: fit-content;
+    margin: 0 auto 14px;
+  }
+}
